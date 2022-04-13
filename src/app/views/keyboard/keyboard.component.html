@@ -1,6 +1,9 @@
 <div id="app-keyboard">
     <div [class]="['row' + i, 'row'].join(' ')" *ngFor="let row of keyboardRows; let i = index">
-        <div class="key" *ngFor="let key of row" [class.enter]="key === 'ENTER' || key === 'BACKSPACE'" [class.half]="key === ''" (click)="handleClickKey(key)">
+        <div class="key" *ngFor="let key of row"
+            [class.enter]="key === 'ENTER' || key === 'BACKSPACE'"
+            [class.half]="key === ''"
+            (click)="handleClickKey(key)">
             <div *ngIf="key !== 'BACKSPACE'; else backspace">
                 {{key}}
             </div>

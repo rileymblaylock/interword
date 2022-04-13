@@ -1,23 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { keyboardRows } from 'src/app/util/constants';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { KeyboardRows } from 'src/app/util/constants';
 
 @Component({
     selector: 'app-keyboard',
     templateUrl: './keyboard.component.html',
     styleUrls: ['./keyboard.component.scss']
 })
-export class KeyboardComponent implements OnInit {
+export class KeyboardComponent {
+    @Output() keyClickEvent = new EventEmitter<string>();
 
-    readonly keyboardRows = keyboardRows;
+    readonly keyboardRows = KeyboardRows;
 
     constructor() { }
 
-    ngOnInit(): void {
-    }
-
     handleClickKey(key: string) {
-        // do something, possibily emit to parent
         console.log(key);
+        this.keyClickEvent.emit(key);
     }
 
 }
