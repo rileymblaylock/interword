@@ -27,7 +27,6 @@ export enum LetterState {
     PENDING,
     BOOKEND, // top or bottom comparison word
     WRONG,
-    MATCH,
-    INVALID // state for all immediately after a wrong letter
+    MATCH
 };
 

@@ -9,8 +9,6 @@
             <div class="row" *ngFor="let row of rows">
                 <div class="letter-container" *ngFor="let letter of row.letters"
                     [class.match]="letter.state === LetterState.MATCH"
-                    [class.wrong]="letter.state === LetterState.WRONG"
-                    [class.invalid]="letter.state === LetterState.INVALID"
                     [class.bookend]="letter.state === LetterState.BOOKEND">
                     {{ letter.text }}
                 </div>
