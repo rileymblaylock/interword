@@ -22,8 +22,10 @@
         margin: 0 3px 0 3px;
         cursor: pointer;
         border-radius: 4px;
-        color: whitesmoke;
-        background-color: rgb(120, 120, 120);
+        color: var(--color-tone-white);
+        border: 1px solid var(--color-tone-gray-2);
+        text-transform: uppercase;
+        background-color: var(--color-tone-gray);
         font-size: 13px;
         font-weight: bold;
         user-select: none;

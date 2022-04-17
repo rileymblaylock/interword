@@ -10,9 +10,9 @@ export class MainComponent implements OnInit {
 
     readonly LetterState = LetterState;
 
-    topWord: string = 'APPLE';
-    targetWord: string = 'MILKS';
-    bottomWord: string = 'ZEBRA';
+    topWord: string = 'apple';
+    targetWord: string = 'build';
+    bottomWord: string = 'candy';
 
     win = false;
 
@@ -45,12 +45,12 @@ export class MainComponent implements OnInit {
                 this.setLetter($event);
                 this.letterIndex++;
             }
-        } else if ($event === 'BACKSPACE') {
+        } else if ($event === 'Backspace') {
             if (this.letterIndex > this.newMinimumIndex) {
                 this.letterIndex--;
                 this.setLetter('');
             }
-        } else if ($event === 'ENTER') {
+        } else if ($event === 'Enter') {
             this.submit();
         }
 
@@ -71,7 +71,7 @@ export class MainComponent implements OnInit {
         // TODO - check if valid word here
 
         // get string word from attempt
-        const attemptString = attemptRow.letters.map(letter => letter.text).join('').toUpperCase();
+        const attemptString = attemptRow.letters.map(letter => letter.text).join('');
 
         this.determineOrder(attemptString);
     }
@@ -90,9 +90,13 @@ export class MainComponent implements OnInit {
             // determine if new top or bottom bookend
             if (attemptString.localeCompare(this.targetWord) === -1) {
                 this.setBookend(attemptString, 0);
+                // set and clear middle row
+                this.updateMiddle();
                 this.topWord = attemptString;
             } else {
                 this.setBookend(attemptString, 2);
+                // set and clear middle row
+                this.updateMiddle();
                 this.bottomWord = attemptString;
             }
         // make sure not equal to existing bookends    
@@ -109,19 +113,23 @@ export class MainComponent implements OnInit {
      * @param index of top or bottom word to replace
      */
     setBookend(attemptString: string, index: number) {
-        // set corresponding bookend
-        this.rows[index].letters.forEach(letter => {
-            letter.text = '';
-            letter.state = LetterState.BOOKEND
-        });
         let letters: Letter[] = [];
         for (let i = 0; i < this.wordLength; i++) {
-            letters.push({ text: attemptString[i], state: LetterState.BOOKEND })
+            letters.push({ text: attemptString[i], state: LetterState.BOOKEND });
         }
         this.rows[index] = {letters};
 
-        // set and clear middle row
-        this.updateMiddle();
+        for (let i = 0; i < this.wordLength; i++) {
+            const letter = this.rows[index].letters[i];
+            if (letter.state !== LetterState.MATCH) {
+                if (letter.text.localeCompare(this.targetWord[i]) === 0) {
+                    letter.state = LetterState.MATCH;
+                } else {
+                    letter.state = LetterState.PENDING;
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -144,7 +152,6 @@ export class MainComponent implements OnInit {
                     break;
                 }
             }
-
         }
         // set new minimum index, then set letterIndex
         this.letterIndex = this.newMinimumIndex;
@@ -165,7 +172,7 @@ export class MainComponent implements OnInit {
 
         letters = [];
         for (let i = 0; i < this.wordLength; i++) {
-            letters.push({ text: this.bottomWord[i].toUpperCase(), state: LetterState.BOOKEND })
+            letters.push({ text: this.bottomWord[i], state: LetterState.BOOKEND })
         }
         this.rows.push({letters});
     }
