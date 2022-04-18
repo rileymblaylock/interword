@@ -22,6 +22,10 @@
                 </div>
             </div>
         </div>
+        <!-- ALPHABET -->
+        <div class="alphabet">
+            <div class="letter" *ngFor="let letter of alphabet">{{letter}}</div>
+        </div>
         <!-- GAME BOARD -->
         <div class="board">
             <div class="row">
@@ -31,7 +35,11 @@
                     {{ letter.text }}
                 </div>
             </div>
-            <div class="elipsis"><img src=".\assets\three-dots-svgrepo-com.svg"></div>
+            <div class="elipsis">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="var(--color-tone-darkgray)" class="bi bi-three-dots" viewBox="0 0 16 16">
+                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                </svg>
+            </div>
             <div class="row center">
                 <div class="letter-container center" *ngFor="let letter of rows[1].letters"
                     [class.match]="letter.state === LetterState.MATCH"
@@ -40,12 +48,29 @@
                     {{ letter.text }}
                 </div>
             </div>
-            <div class="elipsis"> . . . </div>
+            <div class="elipsis">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="var(--color-tone-darkgray)" class="bi bi-three-dots" viewBox="0 0 16 16">
+                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                </svg>
+            </div>
             <div class="row">
                 <div class="letter-container" *ngFor="let letter of rows[2].letters"
                     [class.match]="letter.state === LetterState.MATCH"
                     [class.bookend]="letter.state === LetterState.BOOKEND">
                     {{ letter.text }}
+                </div>
+            </div>
+        </div>
+        <!-- ATTEMPT TRACKER -->
+        <div class="attempt-counter">
+            <div class="attempt-label">
+                Attempts
+            </div>
+            <div class="circle-container">
+                <div class="circle" *ngFor="let _ of [].constructor(numberAttempts)">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="50" fill="none" stroke="var(--color-tone-gray)" stroke-width="4"/>
+                    </svg>
                 </div>
             </div>
         </div>

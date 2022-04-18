@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { Letter, LETTERS, LetterState, Row } from 'src/app/util/constants';
+import { Letter, LETTERS, LetterState, Row, alphabet } from 'src/app/util/constants';
 
 @Component({
     selector: 'app-main',
@@ -9,6 +9,8 @@ import { Letter, LETTERS, LetterState, Row } from 'src/app/util/constants';
 export class MainComponent implements OnInit {
 
     readonly LetterState = LetterState;
+    readonly numberAttempts = 12;
+    readonly alphabet = alphabet;
 
     topWord: string = 'apple';
     targetWord: string = 'build';

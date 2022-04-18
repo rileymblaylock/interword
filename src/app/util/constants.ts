@@ -14,6 +14,8 @@ export const LETTERS = (() => {
     return ret;
 })();
 
+export const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
 export interface Row {
     letters: Letter[];
 };

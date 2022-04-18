@@ -8,6 +8,8 @@ body, html {
 
 body {
     --color-tone-gray: #787878;
+    --color-tone-darkgray: #505050;
+    --color-tone-darkergray: #404040;
     --color-tone-gray-2: #909090;
     --color-tone-lightgray: #b9b9b9;
     --color-tone-white: #f5f5f5;
@@ -20,4 +22,8 @@ h1 {
     font-weight: 700;
     font-size: 36px;
     letter-spacing: 0.2rem;
+
+    @media (max-width: 400px) {
+        font-size: 24px;
+    }
 }
