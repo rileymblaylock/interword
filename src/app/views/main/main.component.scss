@@ -108,6 +108,13 @@
 
                     &.current {
                         border: 2px solid var(--color-tone-lightgray);
+                        animation-name: letter-pop;
+                        animation-duration: 120ms;
+                    }
+
+                    &.has-text {
+                        border: 2px solid var(--color-tone-gray);
+
                     }
 
                     &.match {
@@ -122,22 +129,19 @@
             .elipsis {
                 transform: rotate(90deg);
 
-                @media (max-width: 400px) {
+                @media (max-height: 700px) {
                     transform: none;
                 }
 
                 svg {
                     width: 36px;
                     height: 36px;
-
-                    @media (max-width: 400px) {
-                        height: 12px;
-                    }
                 }
             }
 
             .center {
                 max-width: 400px;
+                max-height: 76px;
             }
         }
 
@@ -174,5 +178,11 @@
         app-keyboard {
             width: 100%;
         }
+    }
+
+    @keyframes letter-pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
     }
 }

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { Letter, LETTERS, LetterState, Row, alphabet } from 'src/app/util/constants';
 
 @Component({
@@ -7,22 +7,27 @@ import { Letter, LETTERS, LetterState, Row, alphabet } from 'src/app/util/consta
     styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit {
+    @ViewChildren('circles') circles!: QueryList<ElementRef>;
 
     readonly LetterState = LetterState;
     readonly numberAttempts = 12;
     readonly alphabet = alphabet;
 
-    topWord: string = 'apple';
-    targetWord: string = 'build';
-    bottomWord: string = 'candy';
-
-    win = false;
-
-    wordLength = 5;
-    middleIndex = 1;
-
     rows: Row[] = [];
 
+    topWord: string = 'flake';
+    targetWord: string = 'gavel';
+    bottomWord: string = 'holds';
+
+    win = false;
+    attempts = 0;
+
+    // UI booleans
+    showAlphabet = false;
+
+    // lengths and indices
+    wordLength = 5;
+    middleIndex = 1;
     letterIndex = 0;
     newMinimumIndex = 0;
 
@@ -42,13 +47,17 @@ export class MainComponent implements OnInit {
             return;
         }
 
+        if (this.attempts >= this.numberAttempts) {
+            console.log("Out of tries!");
+        }
+
         if (LETTERS[$event.toLowerCase()]) {
-            if (this.letterIndex < this.wordLength && this.letterIndex >= this.newMinimumIndex) {
+            if (this.letterIndex < this.wordLength && this.letterIndex >= 0) {
                 this.setLetter($event);
                 this.letterIndex++;
             }
         } else if ($event === 'Backspace') {
-            if (this.letterIndex > this.newMinimumIndex) {
+            if (this.letterIndex > 0) {
                 this.letterIndex--;
                 this.setLetter('');
             }
@@ -139,24 +148,10 @@ export class MainComponent implements OnInit {
      */
     updateMiddle() {
         for (let i = 0; i < this.wordLength; i++) {
-            const letter = this.rows[this.middleIndex].letters[i];
-            if (letter.state !== LetterState.MATCH) {
-                if (letter.text.localeCompare(this.targetWord[i]) === 0) {
-                    letter.state = LetterState.MATCH;
-                } else {
-                    letter.state = LetterState.PENDING;
-                    // set rest to wrong as well
-                    this.newMinimumIndex = i;
-                    for (let j = i; j < this.wordLength; j++) {
-                        this.rows[this.middleIndex].letters[j].text = '';
-                        this.rows[this.middleIndex].letters[j].state = LetterState.PENDING;
-                    }
-                    break;
-                }
-            }
+            this.rows[this.middleIndex].letters[i].text = '';
+            this.rows[this.middleIndex].letters[i].state = LetterState.PENDING;
         }
-        // set new minimum index, then set letterIndex
-        this.letterIndex = this.newMinimumIndex;
+        this.letterIndex = 0;
     }
 
     initRows() {

@@ -23,7 +23,7 @@
             </div>
         </div>
         <!-- ALPHABET -->
-        <div class="alphabet">
+        <div class="alphabet" *ngIf="false">
             <div class="letter" *ngFor="let letter of alphabet">{{letter}}</div>
         </div>
         <!-- GAME BOARD -->
@@ -44,6 +44,7 @@
                 <div class="letter-container center" *ngFor="let letter of rows[1].letters"
                     [class.match]="letter.state === LetterState.MATCH"
                     [class.current]="rows[1].letters.indexOf(letter) === letterIndex"
+                    [class.has-text]="letter.text !== ''"
                     [class.bookend]="letter.state === LetterState.BOOKEND">
                     {{ letter.text }}
                 </div>
@@ -62,12 +63,12 @@
             </div>
         </div>
         <!-- ATTEMPT TRACKER -->
-        <div class="attempt-counter">
+        <div class="attempt-counter" *ngIf="false">
             <div class="attempt-label">
                 Attempts
             </div>
             <div class="circle-container">
-                <div class="circle" *ngFor="let _ of [].constructor(numberAttempts)">
+                <div class="circle" *ngFor="let _ of [].constructor(numberAttempts)" #circles>
                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="50" cy="50" r="50" fill="none" stroke="var(--color-tone-gray)" stroke-width="4"/>
                     </svg>
