@@ -27,7 +27,6 @@ export interface Letter {
 
 export enum LetterState {
     PENDING,
-    BOOKEND, // top or bottom comparison word
     WRONG,
     MATCH
 };

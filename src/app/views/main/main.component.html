@@ -22,16 +22,12 @@
                 </div>
             </div>
         </div>
-        <!-- ALPHABET -->
-        <div class="alphabet" *ngIf="false">
-            <div class="letter" *ngFor="let letter of alphabet">{{letter}}</div>
-        </div>
         <!-- GAME BOARD -->
         <div class="board">
-            <div class="row">
+            <div class="row" #topRow>
                 <div class="letter-container" *ngFor="let letter of rows[0].letters"
                     [class.match]="letter.state === LetterState.MATCH"
-                    [class.bookend]="letter.state === LetterState.BOOKEND">
+                    [class.fold]="rows[0].letters.indexOf(letter) === animationIndex && animationRowIndex === 0">
                     {{ letter.text }}
                 </div>
             </div>
@@ -40,12 +36,11 @@
                     <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
                 </svg>
             </div>
-            <div class="row center">
+            <div class="row center" #middleRow>
                 <div class="letter-container center" *ngFor="let letter of rows[1].letters"
                     [class.match]="letter.state === LetterState.MATCH"
                     [class.current]="rows[1].letters.indexOf(letter) === letterIndex"
-                    [class.has-text]="letter.text !== ''"
-                    [class.bookend]="letter.state === LetterState.BOOKEND">
+                    [class.has-text]="letter.text !== ''">
                     {{ letter.text }}
                 </div>
             </div>
@@ -54,24 +49,11 @@
                     <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
                 </svg>
             </div>
-            <div class="row">
+            <div class="row" #bottomRow>
                 <div class="letter-container" *ngFor="let letter of rows[2].letters"
                     [class.match]="letter.state === LetterState.MATCH"
-                    [class.bookend]="letter.state === LetterState.BOOKEND">
+                    [class.fold]="rows[2].letters.indexOf(letter) === animationIndex && animationRowIndex === 2">
                     {{ letter.text }}
-                </div>
-            </div>
-        </div>
-        <!-- ATTEMPT TRACKER -->
-        <div class="attempt-counter" *ngIf="false">
-            <div class="attempt-label">
-                Attempts
-            </div>
-            <div class="circle-container">
-                <div class="circle" *ngFor="let _ of [].constructor(numberAttempts)" #circles>
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="50" fill="none" stroke="var(--color-tone-gray)" stroke-width="4"/>
-                    </svg>
                 </div>
             </div>
         </div>

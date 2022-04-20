@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Letter, LETTERS, LetterState, Row, alphabet } from 'src/app/util/constants';
 
 @Component({
@@ -7,7 +7,9 @@ import { Letter, LETTERS, LetterState, Row, alphabet } from 'src/app/util/consta
     styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit {
-    @ViewChildren('circles') circles!: QueryList<ElementRef>;
+    @ViewChild('topRow') topRow!: ElementRef;
+    @ViewChild('middleRow') middleRow!: ElementRef;
+    @ViewChild('bottomRow') bottomRow!: ElementRef;
 
     readonly LetterState = LetterState;
     readonly numberAttempts = 12;
@@ -25,11 +27,22 @@ export class MainComponent implements OnInit {
     // UI booleans
     showAlphabet = false;
 
+    // UI Elements
+    topRowElement!: HTMLElement;
+    middleRowElement!: HTMLElement;
+    bottomRowElement!: HTMLElement;
+    topRowLetterElems!: NodeListOf<Element>;
+    middleRowLetterElems!: NodeListOf<Element>;
+    bottomRowLetterElems!: NodeListOf<Element>;
+
     // lengths and indices
     wordLength = 5;
     middleIndex = 1;
     letterIndex = 0;
     newMinimumIndex = 0;
+
+    animationIndex!: number;
+    animationRowIndex!: number;
 
     constructor() { }
 
@@ -76,6 +89,11 @@ export class MainComponent implements OnInit {
         const attemptRow = this.rows[this.middleIndex];
         if (attemptRow.letters.some(letter => letter.text === '')) {
             console.log('Not enough letters');
+            const middleRow = this.middleRow?.nativeElement as HTMLElement;
+            middleRow.classList.add('shake');
+            setTimeout(() => {
+				middleRow.classList.remove('shake');
+			}, 500);
             return;
         }
 
@@ -123,23 +141,58 @@ export class MainComponent implements OnInit {
      * @param attemptString 
      * @param index of top or bottom word to replace
      */
-    setBookend(attemptString: string, index: number) {
+    async setBookend(attemptString: string, index: number) {
+        //set letters
         let letters: Letter[] = [];
         for (let i = 0; i < this.wordLength; i++) {
-            letters.push({ text: attemptString[i], state: LetterState.BOOKEND });
+            letters.push({ text: attemptString[i], state: this.rows[index].letters[i].state });
         }
         this.rows[index] = {letters};
 
+        const topRowElement = this.topRow?.nativeElement as HTMLElement;
+        const bottomRowElement = this.bottomRow?.nativeElement as HTMLElement;
+
+        // animate slam
+        if (index === 0) {
+            topRowElement.classList.add('slam-up');
+            setTimeout(() => {
+                topRowElement.classList.remove('slam-up');
+            }, 500);
+        } else {
+            bottomRowElement.classList.add('slam-down');
+            setTimeout(() => {
+                bottomRowElement.classList.remove('slam-down');
+            }, 500);
+        }
+
+        await this.wait(700);
+
+        this.animationIndex = 0;
+        this.animationRowIndex = index;
+
+        //set colors and color tile animation
+        let skipBool = false; // if skip bool true, acts as a break, but lets loop continue for animations
         for (let i = 0; i < this.wordLength; i++) {
             const letter = this.rows[index].letters[i];
             if (letter.state !== LetterState.MATCH) {
-                if (letter.text.localeCompare(this.targetWord[i]) === 0) {
-                    letter.state = LetterState.MATCH;
+                // set animation class, change state while hidden, then continue animation
+                // finally, remove used animation class(es)
+
+                if(!skipBool) {
+                    if (letter.text.localeCompare(this.targetWord[i]) === 0) {
+                        letter.state = LetterState.MATCH;
+                    } else {
+                        letter.state = LetterState.PENDING;
+                        skipBool = true;
+                    }
                 } else {
                     letter.state = LetterState.PENDING;
-                    break;
                 }
             }
+
+            await this.wait(400);
+
+            this.animationIndex++;
         }
     }
 
@@ -157,7 +210,7 @@ export class MainComponent implements OnInit {
     initRows() {
         let letters: Letter[] = [];
         for (let i = 0; i < this.wordLength; i++) {
-            letters.push({ text: this.topWord[i], state: LetterState.BOOKEND })
+            letters.push({ text: this.topWord[i], state: LetterState.PENDING })
         }
         this.rows.push({letters});
 
@@ -169,9 +222,21 @@ export class MainComponent implements OnInit {
 
         letters = [];
         for (let i = 0; i < this.wordLength; i++) {
-            letters.push({ text: this.bottomWord[i], state: LetterState.BOOKEND })
+            letters.push({ text: this.bottomWord[i], state: LetterState.PENDING })
         }
         this.rows.push({letters});
     }
+
+    /**
+     * @param ms 
+     * @returns utility function for waiting for animation execution
+     */
+    private async wait(ms: number) {
+		await new Promise<void>((resolve) => {
+			setTimeout(() => {
+				resolve();
+			}, ms);
+		})
+	}
 
 }
