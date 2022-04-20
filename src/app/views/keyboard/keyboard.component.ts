@@ -14,7 +14,6 @@ export class KeyboardComponent {
     constructor() { }
 
     handleClickKey(key: string) {
-        console.log(key);
         this.keyClickEvent.emit(key);
     }
 

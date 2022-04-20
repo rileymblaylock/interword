@@ -1,5 +1,6 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Letter, LETTERS, LetterState, Row, alphabet } from 'src/app/util/constants';
+import JSConfetti from 'js-confetti';
 
 @Component({
     selector: 'app-main',
@@ -17,12 +18,17 @@ export class MainComponent implements OnInit {
 
     rows: Row[] = [];
 
-    topWord: string = 'flake';
-    targetWord: string = 'gavel';
-    bottomWord: string = 'holds';
+    topWord: string = 'metal';
+    targetWord: string = 'ovals';
+    bottomWord: string = 'penis';
+
+    // info msg
+    infoMsg = '';
+    fadeOutInfoMessage = false;
 
     win = false;
-    attempts = 0;
+
+    inputLock = false;
 
     // UI booleans
     showAlphabet = false;
@@ -41,8 +47,9 @@ export class MainComponent implements OnInit {
     letterIndex = 0;
     newMinimumIndex = 0;
 
-    animationIndex!: number;
+    animationToggle = false;
     animationRowIndex!: number;
+    animationIndices: Number[] = [];
 
     constructor() { }
 
@@ -60,24 +67,22 @@ export class MainComponent implements OnInit {
             return;
         }
 
-        if (this.attempts >= this.numberAttempts) {
-            console.log("Out of tries!");
-        }
-
-        if (LETTERS[$event.toLowerCase()]) {
-            if (this.letterIndex < this.wordLength && this.letterIndex >= 0) {
-                this.setLetter($event);
-                this.letterIndex++;
+        if (!this.inputLock) {
+            console.log($event);
+            if (LETTERS[$event.toLowerCase()]) {
+                if (this.letterIndex < this.wordLength && this.letterIndex >= 0) {
+                    this.setLetter($event);
+                    this.letterIndex++;
+                }
+            } else if ($event === 'Backspace') {
+                if (this.letterIndex > 0) {
+                    this.letterIndex--;
+                    this.setLetter('');
+                }
+            } else if ($event === 'Enter') {
+                this.submit();
             }
-        } else if ($event === 'Backspace') {
-            if (this.letterIndex > 0) {
-                this.letterIndex--;
-                this.setLetter('');
-            }
-        } else if ($event === 'Enter') {
-            this.submit();
         }
-
     }
 
     setLetter(letter: string) {
@@ -88,12 +93,8 @@ export class MainComponent implements OnInit {
         // check if enough letters
         const attemptRow = this.rows[this.middleIndex];
         if (attemptRow.letters.some(letter => letter.text === '')) {
-            console.log('Not enough letters');
-            const middleRow = this.middleRow?.nativeElement as HTMLElement;
-            middleRow.classList.add('shake');
-            setTimeout(() => {
-				middleRow.classList.remove('shake');
-			}, 500);
+            this.showInfoMessage('Not enough letters');
+            this.shake();
             return;
         }
 
@@ -105,35 +106,42 @@ export class MainComponent implements OnInit {
         this.determineOrder(attemptString);
     }
 
-    determineOrder(attemptString: string) {
+    async determineOrder(attemptString: string) {
         // correct answer, make win
         if (attemptString.localeCompare(this.targetWord) === 0) {
             for (let j = this.newMinimumIndex; j < this.wordLength; j++) {
                 this.rows[this.middleIndex].letters[j].state = LetterState.MATCH;
             }
-            console.log('You win!');
+            //show win message and add animations
+            this.showInfoMessage('You win!', false);
             this.win = true;
+            await this.wait(450);
+            const middleRowElement = this.middleRow?.nativeElement as HTMLElement;
+            middleRowElement.classList.add('letter-pop');
+            const jsConfetti = new JSConfetti();
+            jsConfetti.addConfetti();
+
+            //toggle stats container
+            
             return;
         // check if in bookend bounds
         } else if (attemptString.localeCompare(this.bottomWord) === -1  && attemptString.localeCompare(this.topWord) === 1) {
             // determine if new top or bottom bookend
             if (attemptString.localeCompare(this.targetWord) === -1) {
                 this.setBookend(attemptString, 0);
-                // set and clear middle row
-                this.updateMiddle();
                 this.topWord = attemptString;
             } else {
                 this.setBookend(attemptString, 2);
-                // set and clear middle row
-                this.updateMiddle();
                 this.bottomWord = attemptString;
             }
         // make sure not equal to existing bookends    
         } else if (attemptString.localeCompare(this.bottomWord) === 0 || attemptString.localeCompare(this.topWord) === 0) {
-            console.log('Guess already made.');
+            this.showInfoMessage('Guess already made');
+            this.shake();
         // outside of word range
         } else {
-            console.log('Out of bounds.');
+            this.showInfoMessage('Out of bounds');
+            this.shake();
         }
     }
 
@@ -142,15 +150,31 @@ export class MainComponent implements OnInit {
      * @param index of top or bottom word to replace
      */
     async setBookend(attemptString: string, index: number) {
-        //set letters
+
+        // hacky mutex
+        this.inputLock = true;
+
+        // get all row elements
+        const topRowElement = this.topRow?.nativeElement as HTMLElement;
+        const middleRowElement = this.middleRow?.nativeElement as HTMLElement;
+        const bottomRowElement = this.bottomRow?.nativeElement as HTMLElement;
+
+        //animate middle row to move towards top or bottom bookend
+        if (index == 0) {
+            middleRowElement.classList.add('move-up');
+        } else {
+            middleRowElement.classList.add('move-down');
+        }
+
+        // wait a bit before move down animation should occur
+        await this.wait(100);
+
+        // set letters of bookend and keep existing states for now
         let letters: Letter[] = [];
         for (let i = 0; i < this.wordLength; i++) {
             letters.push({ text: attemptString[i], state: this.rows[index].letters[i].state });
         }
         this.rows[index] = {letters};
-
-        const topRowElement = this.topRow?.nativeElement as HTMLElement;
-        const bottomRowElement = this.bottomRow?.nativeElement as HTMLElement;
 
         // animate slam
         if (index === 0) {
@@ -165,10 +189,11 @@ export class MainComponent implements OnInit {
             }, 500);
         }
 
+        // wait a bit between slam and tile animation
         await this.wait(700);
-
-        this.animationIndex = 0;
         this.animationRowIndex = index;
+        this.animationToggle = true;
+        this.animationIndices = [];
 
         //set colors and color tile animation
         let skipBool = false; // if skip bool true, acts as a break, but lets loop continue for animations
@@ -177,6 +202,7 @@ export class MainComponent implements OnInit {
             if (letter.state !== LetterState.MATCH) {
                 // set animation class, change state while hidden, then continue animation
                 // finally, remove used animation class(es)
+                this.animationIndices.push(i);
 
                 if(!skipBool) {
                     if (letter.text.localeCompare(this.targetWord[i]) === 0) {
@@ -189,22 +215,27 @@ export class MainComponent implements OnInit {
                     letter.state = LetterState.PENDING;
                 }
             }
-
-            await this.wait(400);
-
-            this.animationIndex++;
         }
-    }
+        await this.wait(400);
+        this.animationToggle = false;
 
-    /**
-     * @returns sets letters and classes of middle row after a guess
-     */
-    updateMiddle() {
+        // update middle values
         for (let i = 0; i < this.wordLength; i++) {
             this.rows[this.middleIndex].letters[i].text = '';
             this.rows[this.middleIndex].letters[i].state = LetterState.PENDING;
         }
         this.letterIndex = 0;
+
+        // add pop in animation to center
+        middleRowElement.classList.add('pop-in');
+        setTimeout(() => {
+            middleRowElement.classList.remove('move-up');
+            middleRowElement.classList.remove('move-down');
+            middleRowElement.classList.remove('pop-in');
+        }, 500);
+
+        this.inputLock = false;
+
     }
 
     initRows() {
@@ -238,5 +269,26 @@ export class MainComponent implements OnInit {
 			}, ms);
 		})
 	}
+
+    private showInfoMessage(msg: string, hide = true) {
+		this.infoMsg = msg;
+		if (hide) {
+			setTimeout(() => {
+				this.fadeOutInfoMessage = true;
+				setTimeout(() => {
+					this.infoMsg = '';
+					this.fadeOutInfoMessage = false;
+				}, 500);
+			}, 2000);
+		}
+	}
+
+    shake() {
+        const middleRow = this.middleRow?.nativeElement as HTMLElement;
+        middleRow.classList.add('shake');
+        setTimeout(() => {
+            middleRow.classList.remove('shake');
+        }, 500);
+    }
 
 }

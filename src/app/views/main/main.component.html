@@ -27,7 +27,7 @@
             <div class="row" #topRow>
                 <div class="letter-container" *ngFor="let letter of rows[0].letters"
                     [class.match]="letter.state === LetterState.MATCH"
-                    [class.fold]="rows[0].letters.indexOf(letter) === animationIndex && animationRowIndex === 0">
+                    [class.fold]="animationIndices.includes(rows[0].letters.indexOf(letter)) && animationToggle && animationRowIndex === 0">
                     {{ letter.text }}
                 </div>
             </div>
@@ -40,7 +40,8 @@
                 <div class="letter-container center" *ngFor="let letter of rows[1].letters"
                     [class.match]="letter.state === LetterState.MATCH"
                     [class.current]="rows[1].letters.indexOf(letter) === letterIndex"
-                    [class.has-text]="letter.text !== ''">
+                    [class.has-text]="letter.text !== ''"
+                    [class.fold]="win">
                     {{ letter.text }}
                 </div>
             </div>
@@ -52,12 +53,18 @@
             <div class="row" #bottomRow>
                 <div class="letter-container" *ngFor="let letter of rows[2].letters"
                     [class.match]="letter.state === LetterState.MATCH"
-                    [class.fold]="rows[2].letters.indexOf(letter) === animationIndex && animationRowIndex === 2">
+                    [class.fold]="animationIndices.includes(rows[2].letters.indexOf(letter)) && animationToggle && animationRowIndex === 2">
                     {{ letter.text }}
                 </div>
             </div>
         </div>
         <!-- KEYBOARD -->
         <app-keyboard (keyClickEvent)="handleClickKey($event)"></app-keyboard>
+        <!-- INFO MSG -->
+        <div class="info-msg"
+            [class.show]="infoMsg !== ''"
+            [class.fade-out]="fadeOutInfoMessage">
+            {{ infoMsg }}
+        </div>
     </div>
 </div>
