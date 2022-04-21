@@ -259,7 +259,7 @@
                 .twitter {
                     display: flex;
                     margin: 8px 20px;
-                    justify-content: right;
+                    justify-content: flex-end;
                 }
 
                 .stats-sub-header {
@@ -285,7 +285,8 @@
                         width: 106%;
                         height: 100%;
                         display: flex;
-                        justify-content: right;
+                        justify-content: flex-end;
+                        text-align: right;
                         align-items: center;
                         padding-right: 12px;
                     }
