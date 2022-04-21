@@ -203,7 +203,7 @@
             .content {
                 position: absolute;
                 width: 300px;
-                height: 300px;
+                height: auto;
                 background-color: var(--color-tone-blue);
                 display: flex;
                 flex-direction: column;
@@ -220,17 +220,21 @@
                 }
 
                 &.share {
-                    height: 550px;
+                    height: auto;
                 }
 
                 &.help {
                     width: 350px;
-                    height: 212px;
+                    height: auto;
                 }
 
                 .heart-message {
                     color: var(--color-tone-white);
                     margin: 6px 16px 6px 16px;
+
+                    &.last {
+                        padding-bottom: 12px;
+                    }
                 }
 
                 .button {
@@ -258,7 +262,7 @@
 
                 .twitter {
                     display: flex;
-                    margin: 8px 20px;
+                    margin: 8px 20px 12px 20px;
                     justify-content: flex-end;
                 }
 
@@ -306,7 +310,7 @@
                     flex-direction: row;
                     justify-content: center;
                     align-items: center;
-                    margin-bottom: 20px;
+                    margin-bottom: 32px;
                     margin-top: 38px;
 
                     .timer-container {
