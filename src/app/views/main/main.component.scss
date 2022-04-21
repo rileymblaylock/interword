@@ -185,6 +185,158 @@
                 transition: opacity 500ms;
             }
         }
+
+        .pop-up-container {
+            background-color: var(--bkg-color-transparent);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            display: flex;
+
+            &.show {
+                visibility: visible;
+            }
+
+            .content {
+                position: absolute;
+                width: 300px;
+                height: 300px;
+                background-color: var(--color-tone-blue);
+                display: flex;
+                flex-direction: column;
+                border: 1px solid var(--color-tone-lightblue);
+                border-radius: 8px;
+                box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.2), 0 4px 10px -6px rgb(0 0 0 / 0.1);
+                opacity: 0;
+                transform: translateY(-60px);
+                transition: all 300ms ease-out;
+
+                &.show {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+                &.share {
+                    height: 450px;
+                }
+
+                &.help {
+                    width: 350px;
+                    height: 450px;
+                }
+
+                .heart-message {
+                    color: var(--color-tone-white);
+                    margin: 6px 16px 6px 16px;
+                }
+
+                .button {
+                    display: flex;
+                    justify-content: center;
+                    margin-top: 22px;
+                }
+
+                .other-games-head {
+                    margin: 26px 16px 6px 16px;
+                    font-size: small;
+                    color: var(--color-tone-lightgray);
+                    font-weight: 700;
+                }
+
+                .game-title {
+                    font-size: 12px;
+                    color: var(--color-tone-white);
+                    margin: 12px 16px 6px 16px;
+
+                    a {
+                        color: var(--color-tone-white);
+                    }
+                }
+
+                .stats-row {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+
+                    .stats-box {
+                        padding: 16px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+
+                        .stat-num {
+                            font-size: large;
+                            text-align: center;
+                        }
+
+                        .stat-type {
+                            font-size: smaller;
+                            text-align: center;
+                        }
+                    }
+                }
+
+                .histogram-container {
+                    //TODO REMOVE
+                    width: 150px;
+                    height: 200px
+                }
+
+                .bottom-row {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+                    margin-bottom: 20px;
+
+                    .timer-container {
+                        display: flex;
+                        flex-direction: column;
+                        font-weight: 700;
+                        padding: 0 12px 0 8px;
+    
+                        .header {
+                            font-size: large;
+                            text-align: center;
+                        }
+    
+                        .timer {
+                            font-size: xx-large;
+                            text-align: center;
+                        }
+                    }
+
+                    button {
+                        background-color: var(--color-tone-green);
+                        color: var(--color-tone-white);
+                        font-weight: bold;
+                        font-size: 14px;
+                        padding: 12px 14px;
+                        border-radius: 4px;
+                        border: none;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        margin-left: 12px;
+                        margin-bottom: 4px;
+
+                        &.give-up {
+                            background-color: var(--color-tone-red);
+                            padding: 16px 18px;
+                        }
+                        
+                        svg {
+                            padding-left: 8px;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @keyframes letter-pop {

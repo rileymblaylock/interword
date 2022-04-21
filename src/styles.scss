@@ -3,7 +3,7 @@ body, html {
     padding: 0;
     overflow: hidden;
     height: 100%;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
 body {
@@ -13,17 +13,31 @@ body {
     --color-tone-gray: #787878;
     --color-tone-darkgray: #505050;
     --color-tone-darkergray: #404040;
+    --color-tone-darkergray-2: #303030;
     --color-tone-green: #349247;
+    --color-tone-red: #924734;
+    --color-tone-lightblue: #131d36;
     --color-tone-blue: #0f172a;
+    --color-tone-darkerblue: #0b111f;
+    --bkg-color-transparent: #0a101d8e;
 }
 
 h1 {
     text-transform: uppercase;
     font-weight: 700;
-    font-size: 36px;
-    letter-spacing: 0.2rem;
+    font-size: 34px;
+    letter-spacing: 0.3rem;
 
-    @media (max-width: 400px) {
-        font-size: 24px;
+    @media (max-width: 450px) {
+        font-size: 26px;
+        margin-left: 2px;
     }
+}
+
+h2 {
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 20px;
+    color: #a9a9a9;
+    margin: 12px 0 6px 16px;
 }

@@ -22,6 +22,13 @@ export class MainComponent implements OnInit {
     targetWord: string = 'ovals';
     bottomWord: string = 'penis';
 
+    // TODO get dynamically from backend
+    showShareButton = false;
+
+    // init with day, time to get, etc
+    clipboardString = '';
+    emojiString = '';
+
     // info msg
     infoMsg = '';
     fadeOutInfoMessage = false;
@@ -30,16 +37,15 @@ export class MainComponent implements OnInit {
 
     inputLock = false;
 
-    // UI booleans
-    showAlphabet = false;
-
     // UI Elements
     topRowElement!: HTMLElement;
     middleRowElement!: HTMLElement;
     bottomRowElement!: HTMLElement;
-    topRowLetterElems!: NodeListOf<Element>;
-    middleRowLetterElems!: NodeListOf<Element>;
-    bottomRowLetterElems!: NodeListOf<Element>;
+    
+    // UI booleans
+    showStatsContainer = false;
+    showHeartContainer = false;
+    showHelpContainer = false;
 
     // lengths and indices
     wordLength = 5;
@@ -71,7 +77,7 @@ export class MainComponent implements OnInit {
             console.log($event);
             if (LETTERS[$event.toLowerCase()]) {
                 if (this.letterIndex < this.wordLength && this.letterIndex >= 0) {
-                    this.setLetter($event);
+                    this.setLetter($event.toLowerCase());
                     this.letterIndex++;
                 }
             } else if ($event === 'Backspace') {
@@ -113,15 +119,18 @@ export class MainComponent implements OnInit {
                 this.rows[this.middleIndex].letters[j].state = LetterState.MATCH;
             }
             //show win message and add animations
-            this.showInfoMessage('You win!', false);
+            this.showInfoMessage('You win!', 3000);
             this.win = true;
+            this.showShareButton = true;
             await this.wait(450);
             const middleRowElement = this.middleRow?.nativeElement as HTMLElement;
             middleRowElement.classList.add('letter-pop');
             const jsConfetti = new JSConfetti();
             jsConfetti.addConfetti();
 
+            await this.wait(1500);
             //toggle stats container
+            this.toggleStats();
             
             return;
         // check if in bookend bounds
@@ -207,16 +216,20 @@ export class MainComponent implements OnInit {
                 if(!skipBool) {
                     if (letter.text.localeCompare(this.targetWord[i]) === 0) {
                         letter.state = LetterState.MATCH;
+                        this.emojiString += '🟩';
                     } else {
                         letter.state = LetterState.PENDING;
+                        this.emojiString += '🟦';
                         skipBool = true;
                     }
                 } else {
                     letter.state = LetterState.PENDING;
+                    this.emojiString += '🟦';
                 }
             }
         }
-        await this.wait(400);
+        this.emojiString += '\n';
+        await this.wait(600);
         this.animationToggle = false;
 
         // update middle values
@@ -236,6 +249,22 @@ export class MainComponent implements OnInit {
 
         this.inputLock = false;
 
+    }
+
+    handleClickShare() {
+        // TO DO
+        this.showStatsContainer = false;
+
+        this.clipboardString += 'INFO ABOUT DAYS GAME\n';
+
+        this.clipboardString += this.emojiString;
+        navigator.clipboard.writeText(this.clipboardString);
+
+        this.showInfoMessage('Results copied to clipboard');
+    }
+
+    giveUp() {
+        // TODO
     }
 
     initRows() {
@@ -267,20 +296,18 @@ export class MainComponent implements OnInit {
 			setTimeout(() => {
 				resolve();
 			}, ms);
-		})
+		});
 	}
 
-    private showInfoMessage(msg: string, hide = true) {
+    private showInfoMessage(msg: string, time = 2000) {
 		this.infoMsg = msg;
-		if (hide) {
-			setTimeout(() => {
-				this.fadeOutInfoMessage = true;
-				setTimeout(() => {
-					this.infoMsg = '';
-					this.fadeOutInfoMessage = false;
-				}, 500);
-			}, 2000);
-		}
+        setTimeout(() => {
+            this.fadeOutInfoMessage = true;
+            setTimeout(() => {
+                this.infoMsg = '';
+                this.fadeOutInfoMessage = false;
+            }, 500);
+        }, time);
 	}
 
     shake() {
@@ -289,6 +316,18 @@ export class MainComponent implements OnInit {
         setTimeout(() => {
             middleRow.classList.remove('shake');
         }, 500);
+    }
+
+    toggleHeart() {
+		this.showHeartContainer = !this.showHeartContainer;
+	}
+
+    toggleStats() {
+        this.showStatsContainer = !this.showStatsContainer;
+    }
+
+    toggleHelp() {
+        this.showHelpContainer = !this.showHelpContainer;
     }
 
 }
