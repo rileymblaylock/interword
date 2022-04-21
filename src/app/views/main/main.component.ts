@@ -20,7 +20,7 @@ export class MainComponent implements OnInit {
 
     topWord: string = 'metal';
     targetWord: string = 'ovals';
-    bottomWord: string = 'penis';
+    bottomWord: string = 'pants';
 
     // TODO get dynamically from backend
     showShareButton = false;
