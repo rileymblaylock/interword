@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "interword-game"
+  },
+  "targets": {
+    "interword-game": {
+      "hosting": {
+        "interword": [
+          "interword-game"
+        ]
+      }
+    }
   }
 }

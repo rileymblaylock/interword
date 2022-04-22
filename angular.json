@@ -110,6 +110,16 @@
               "src/**/*.html"
             ]
           }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "prerender": false,
+            "ssr": false,
+            "browserTarget": "interword:build:production",
+            "firebaseProject": "interword-game",
+            "firebaseHostingSite": "interword-game"
+          }
         }
       }
     }

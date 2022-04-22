@@ -57,7 +57,8 @@ export class MainComponent implements OnInit {
     animationRowIndex!: number;
     animationIndices: Number[] = [];
 
-    constructor() { }
+    constructor(
+    ) { }
 
     @HostListener('document:keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
