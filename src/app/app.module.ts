@@ -5,9 +5,11 @@ import { KeyboardComponent } from './views/keyboard/keyboard.component';
 import { MainComponent } from './views/main/main.component';
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
-import { provideFunctions,getFunctions } from '@angular/fire/functions';
 import { provideAnalytics,getAnalytics,ScreenTrackingService,UserTrackingService } from '@angular/fire/analytics';
-import { provideDatabase,getDatabase } from '@angular/fire/database';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
+import { Auth, AuthModule, provideAuth } from '@angular/fire/auth';
+import { getAuth } from 'firebase/auth';
 
 @NgModule({
     declarations: [
@@ -17,10 +19,12 @@ import { provideDatabase,getDatabase } from '@angular/fire/database';
     ],
     imports: [
         BrowserModule,
+        AngularFireModule.initializeApp(environment.firebase),
+        AngularFireAnalyticsModule,
+        AuthModule,
         provideFirebaseApp(() => initializeApp(environment.firebase)),
-        provideFunctions(() => getFunctions()),
         provideAnalytics(() => getAnalytics()),
-        provideDatabase(() => getDatabase())
+        provideAuth(() => getAuth())
     ],
     providers: [
         ScreenTrackingService,

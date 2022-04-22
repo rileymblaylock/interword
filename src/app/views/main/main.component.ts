@@ -1,6 +1,7 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Letter, LETTERS, LetterState, Row, alphabet } from 'src/app/util/constants';
 import JSConfetti from 'js-confetti';
+import { AngularFireAnalytics  } from '@angular/fire/compat/analytics';
 
 @Component({
     selector: 'app-main',
@@ -58,6 +59,7 @@ export class MainComponent implements OnInit {
     animationIndices: Number[] = [];
 
     constructor(
+        private analytics: AngularFireAnalytics
     ) { }
 
     @HostListener('document:keydown', ['$event'])
@@ -105,8 +107,6 @@ export class MainComponent implements OnInit {
             return;
         }
 
-        // TODO - check if valid word here
-
         // get string word from attempt
         const attemptString = attemptRow.letters.map(letter => letter.text).join('');
 
@@ -121,6 +121,7 @@ export class MainComponent implements OnInit {
             }
             //show win message and add animations
             this.showInfoMessage('You win!', 3000);
+            this.analytics.logEvent('win');
             this.win = true;
             this.showShareButton = true;
             await this.wait(450);
@@ -131,18 +132,20 @@ export class MainComponent implements OnInit {
 
             await this.wait(1500);
             //toggle stats container
-            this.toggleStats();
+            this.showStatsContainer = true;
             
             return;
         // check if in bookend bounds
         } else if (attemptString.localeCompare(this.bottomWord) === -1  && attemptString.localeCompare(this.topWord) === 1) {
-            // determine if new top or bottom bookend
-            if (attemptString.localeCompare(this.targetWord) === -1) {
-                this.setBookend(attemptString, 0);
-                this.topWord = attemptString;
-            } else {
-                this.setBookend(attemptString, 2);
-                this.bottomWord = attemptString;
+            if (true /** not in bounds - TODO */) {
+                // determine if new top or bottom bookend
+                if (attemptString.localeCompare(this.targetWord) === -1) {
+                    this.setBookend(attemptString, 0);
+                    this.topWord = attemptString;
+                } else {
+                    this.setBookend(attemptString, 2);
+                    this.bottomWord = attemptString;
+                }
             }
         // make sure not equal to existing bookends    
         } else if (attemptString.localeCompare(this.bottomWord) === 0 || attemptString.localeCompare(this.topWord) === 0) {
@@ -150,7 +153,7 @@ export class MainComponent implements OnInit {
             this.shake();
         // outside of word range
         } else {
-            this.showInfoMessage('Out of bounds');
+            this.showInfoMessage('Error');
             this.shake();
         }
     }
@@ -318,17 +321,4 @@ export class MainComponent implements OnInit {
             middleRow.classList.remove('shake');
         }, 500);
     }
-
-    toggleHeart() {
-		this.showHeartContainer = !this.showHeartContainer;
-	}
-
-    toggleStats() {
-        this.showStatsContainer = !this.showStatsContainer;
-    }
-
-    toggleHelp() {
-        this.showHelpContainer = !this.showHelpContainer;
-    }
-
 }
