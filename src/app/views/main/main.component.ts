@@ -1,7 +1,15 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Letter, LETTERS, LetterState, Row, alphabet } from 'src/app/util/constants';
 import JSConfetti from 'js-confetti';
-import { AngularFireAnalytics  } from '@angular/fire/compat/analytics';
+import targetWords from 'src/app/util/targetWords.json';
+import dictionary from 'src/app/util/dictionary.json';
+
+import { initializeApp } from "firebase/app";
+import { getAnalytics, logEvent } from "firebase/analytics";
+import { environment } from 'src/environments/environment';
+import { FirebaseApp } from '@angular/fire/app';
+import { Analytics } from '@angular/fire/analytics';
+
 
 @Component({
     selector: 'app-main',
@@ -12,6 +20,9 @@ export class MainComponent implements OnInit {
     @ViewChild('topRow') topRow!: ElementRef;
     @ViewChild('middleRow') middleRow!: ElementRef;
     @ViewChild('bottomRow') bottomRow!: ElementRef;
+
+    app: FirebaseApp = initializeApp(environment.firebase);
+    analytics: Analytics = getAnalytics(this.app);
 
     readonly LetterState = LetterState;
     readonly numberAttempts = 12;
@@ -58,9 +69,7 @@ export class MainComponent implements OnInit {
     animationRowIndex!: number;
     animationIndices: Number[] = [];
 
-    constructor(
-        private analytics: AngularFireAnalytics
-    ) { }
+    constructor() {}
 
     @HostListener('document:keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
@@ -68,7 +77,37 @@ export class MainComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.startTimer();
+        this.getDailyWords();
         this.initRows();
+    }
+
+    getDailyWords() {
+        console.log(targetWords);
+        console.log(dictionary);
+    }
+
+    startTimer() {
+        let div = document.getElementById("timer") as HTMLElement;
+ 
+        setInterval(function(){ 
+            var date = new Date(); 
+            var now_utc =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+                date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+            var todayDate = new Date(now_utc);
+            var tomorrow = new Date(now_utc);
+            tomorrow.setUTCHours(24,0,0,0);
+            var diffMS = tomorrow.getTime()/1000-todayDate.getTime()/1000;
+            var diffHr = Math.floor(diffMS/3600);
+            diffMS = diffMS-diffHr*3600;
+            var diffMi = Math.floor(diffMS/60);
+            diffMS = diffMS-diffMi*60;
+            var diffS = Math.floor(diffMS);
+            var result = ((diffHr<10)?"0"+diffHr:diffHr);
+            result += ":"+((diffMi<10)?"0"+diffMi:diffMi);
+            result += ":"+((diffS<10)?"0"+diffS:diffS);
+            div.innerHTML = String(result);
+        }, 1000);
     }
 
     handleClickKey($event: string) {
@@ -121,7 +160,6 @@ export class MainComponent implements OnInit {
             }
             //show win message and add animations
             this.showInfoMessage('You win!', 3000);
-            this.analytics.logEvent('win');
             this.win = true;
             this.showShareButton = true;
             await this.wait(450);
@@ -137,7 +175,7 @@ export class MainComponent implements OnInit {
             return;
         // check if in bookend bounds
         } else if (attemptString.localeCompare(this.bottomWord) === -1  && attemptString.localeCompare(this.topWord) === 1) {
-            if (true /** not in bounds - TODO */) {
+            if (true /** determine if valid word - TODO */) {
                 // determine if new top or bottom bookend
                 if (attemptString.localeCompare(this.targetWord) === -1) {
                     this.setBookend(attemptString, 0);
@@ -153,7 +191,7 @@ export class MainComponent implements OnInit {
             this.shake();
         // outside of word range
         } else {
-            this.showInfoMessage('Error');
+            this.showInfoMessage('Out of bounds');
             this.shake();
         }
     }
@@ -320,5 +358,17 @@ export class MainComponent implements OnInit {
         setTimeout(() => {
             middleRow.classList.remove('shake');
         }, 500);
+    }
+
+    toggleHeart() {
+        this.showHeartContainer = !this.showHeartContainer;
+    }
+
+    toggleStats() {
+        this.showStatsContainer = !this.showStatsContainer;
+    }
+
+    toggleHelp() {
+        this.showHelpContainer = !this.showHelpContainer;
     }
 }
