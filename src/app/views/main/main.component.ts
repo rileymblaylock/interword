@@ -1,15 +1,11 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { Letter, LETTERS, LetterState, Row, alphabet } from 'src/app/util/constants';
+import { Letter, LETTERS, LetterState, Row, alphabet, wordsDict, startDateConstant, gameStatsObject } from 'src/app/util/constants';
 import JSConfetti from 'js-confetti';
-import targetWords from 'src/app/util/targetWords.json';
-import dictionary from 'src/app/util/dictionary.json';
-
 import { initializeApp } from "firebase/app";
 import { getAnalytics, logEvent } from "firebase/analytics";
 import { environment } from 'src/environments/environment';
 import { FirebaseApp } from '@angular/fire/app';
 import { Analytics } from '@angular/fire/analytics';
-
 
 @Component({
     selector: 'app-main',
@@ -21,25 +17,24 @@ export class MainComponent implements OnInit {
     @ViewChild('middleRow') middleRow!: ElementRef;
     @ViewChild('bottomRow') bottomRow!: ElementRef;
 
+    // Firebase
     app: FirebaseApp = initializeApp(environment.firebase);
     analytics: Analytics = getAnalytics(this.app);
 
     readonly LetterState = LetterState;
-    readonly numberAttempts = 12;
     readonly alphabet = alphabet;
 
     rows: Row[] = [];
 
-    topWord: string = 'metal';
-    targetWord: string = 'ovals';
-    bottomWord: string = 'pants';
+    topWord!: string;
+    targetWord!: string;
+    bottomWord!: string;
+    days!: number;
+    topRowGuess!: string;
+    bottomRowGuess!: string;
 
-    // TODO get dynamically from backend
-    showShareButton = false;
-
-    // init with day, time to get, etc
+    // clipboard strings
     clipboardString = '';
-    emojiString = '';
 
     // info msg
     infoMsg = '';
@@ -58,6 +53,7 @@ export class MainComponent implements OnInit {
     showStatsContainer = false;
     showHeartContainer = false;
     showHelpContainer = false;
+    showShareButton = false; // show share button if win=true
 
     // lengths and indices
     wordLength = 5;
@@ -65,6 +61,16 @@ export class MainComponent implements OnInit {
     letterIndex = 0;
     newMinimumIndex = 0;
 
+    // stats
+    guesses = 0;
+    streak!: number;
+    daysPlayed!: number;
+    maxStreak!: number;
+    minGuesses!: number;
+    maxGuesses!: number;
+    avgGuesses!: number;
+
+    // animations
     animationToggle = false;
     animationRowIndex!: number;
     animationIndices: Number[] = [];
@@ -78,13 +84,136 @@ export class MainComponent implements OnInit {
 
     ngOnInit(): void {
         this.startTimer();
-        this.getDailyWords();
-        this.initRows();
+        this.getCurrentDaysSince();
     }
 
-    getDailyWords() {
-        console.log(targetWords);
-        console.log(dictionary);
+    getCurrentDaysSince() {
+        let date = new Date();
+        let dateUTC =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+            date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+        // current date in UTC
+        let currentDateUTC = new Date(dateUTC);
+        // get predetermined start date in UTC
+        let startDate = startDateConstant;
+        this.days = currentDateUTC.getTime() - startDate.getTime();
+        this.days = Math.floor(this.days / (1000 * 3600 * 24));
+        //set todays words
+        this.getDailyWords(this.days);
+    }
+
+    getDailyWords(days: number) {
+        let todaysWords;
+        // handle case in which its been over 1000 days
+        if (days > wordsDict.targetWords.length) {
+            todaysWords = wordsDict.targetWords[days - wordsDict.targetWords.length];
+        } else {
+            todaysWords = wordsDict.targetWords[days];
+        }
+        this.targetWord = todaysWords[0];
+        this.topWord = todaysWords[1];
+        this.bottomWord = todaysWords[2];
+        this.initRows();
+        this.getLocalStorage(days);
+    }
+
+    async getLocalStorage(days: number) {
+        // not new player
+        if (localStorage.getItem('gameStatsObject')) {
+            const gameStats: gameStatsObject = JSON.parse(localStorage.getItem('gameStatsObject')!);
+            // new day
+            if (gameStats.dayNumber < days) {
+                if (gameStats.prevPlayedDay?.valueOf() !== days - 1) {
+                    gameStats.streak = 0;
+                }
+                gameStats.dayNumber = days;
+                gameStats.playedToday = false;
+                gameStats.guesses = 0;
+                gameStats.topRowGuess = undefined;
+                gameStats.bottomRowGuess = undefined;
+                localStorage.setItem('gameStatsObject', JSON.stringify(gameStats));
+                this.setGlobalStats(gameStats);
+            }
+            // not new day, has played
+            else if (gameStats.playedToday === true) {
+                // don't do anything to local storage, just init board
+                this.initWin(gameStats);
+                this.setGlobalStats(gameStats);
+                this.guesses = gameStats.guesses;
+            } 
+            // not new day, hasn't played
+            else {
+                this.setGlobalStats(gameStats);
+            }
+        // new player
+        } else {
+            await this.wait(500);
+            this.toggleHelp();
+        }
+    }
+
+    setLocalStorage() {
+        // not new player
+        if (localStorage.getItem('gameStatsObject')) {
+            let gameStats: gameStatsObject = JSON.parse(localStorage.getItem('gameStatsObject')!);
+            // set streak and max streak
+            if (gameStats.prevPlayedDay?.valueOf()! === this.days - 1) {
+                this.streak = gameStats.streak += 1;
+            } else {
+                this.streak = 1;
+            }
+            this.maxStreak = Math.max(this.streak, gameStats.maxStreak);
+            this.daysPlayed = gameStats.daysPlayed + 1;
+            this.minGuesses = Math.min(gameStats.minGuesses, this.guesses);
+            this.maxGuesses = Math.max(gameStats.maxGuesses, this.guesses);
+            this.avgGuesses = gameStats.avgGuesses + ((this.guesses - gameStats.avgGuesses) / this.daysPlayed);
+            this.avgGuesses = Math.round(this.avgGuesses * 100)/100;
+            gameStats.playedToday = true;
+            gameStats.dayNumber = this.days;
+            gameStats.guesses = this.guesses;
+            gameStats.prevPlayedDay = this.days;
+            gameStats.daysPlayed = this.daysPlayed;
+            gameStats.streak = this.streak;
+            gameStats.maxStreak = this.maxStreak;
+            gameStats.minGuesses = this.minGuesses;
+            gameStats.maxGuesses = this.maxGuesses;
+            gameStats.avgGuesses = this.avgGuesses;
+            gameStats.topRowGuess = this.topRowGuess;
+            gameStats.bottomRowGuess = this.bottomRowGuess;
+            localStorage.setItem('gameStatsObject', JSON.stringify(gameStats));
+        }
+        //new player
+        else {
+            this.streak = 1;
+            this.daysPlayed = 1;
+            this.maxStreak = 1;
+            this.minGuesses = this.guesses;
+            this.maxGuesses = this.guesses;
+            this.avgGuesses = this.guesses;
+            const gameStats: gameStatsObject = {
+                playedToday: true,
+                dayNumber: this.days,
+                prevPlayedDay: this.days,
+                guesses: this.guesses,
+                streak: this.streak,
+                daysPlayed: this.daysPlayed,
+                maxStreak: this.maxStreak,
+                minGuesses: this.minGuesses,
+                maxGuesses: this.maxGuesses,
+                avgGuesses: this.avgGuesses,
+                topRowGuess: this.topRowGuess,
+                bottomRowGuess: this.bottomRowGuess
+            }
+            localStorage.setItem('gameStatsObject', JSON.stringify(gameStats));
+        }
+    }
+
+    setGlobalStats(gameStats: gameStatsObject) {
+        this.streak = gameStats.streak;
+        this.daysPlayed = gameStats.daysPlayed;
+        this.maxStreak = gameStats.maxStreak;
+        this.minGuesses = gameStats.minGuesses;
+        this.maxGuesses = gameStats.maxGuesses;
+        this.avgGuesses = Math.round(gameStats.avgGuesses * 100) / 100;
     }
 
     startTimer() {
@@ -116,7 +245,6 @@ export class MainComponent implements OnInit {
         }
 
         if (!this.inputLock) {
-            console.log($event);
             if (LETTERS[$event.toLowerCase()]) {
                 if (this.letterIndex < this.wordLength && this.letterIndex >= 0) {
                     this.setLetter($event.toLowerCase());
@@ -152,6 +280,49 @@ export class MainComponent implements OnInit {
         this.determineOrder(attemptString);
     }
 
+    async initWin(gameStats: gameStatsObject) {
+        //set top and bottom row
+        if (gameStats.topRowGuess) {
+            for (let j = 0; j < this.wordLength; j++) {
+                this.rows[0].letters[j].text = gameStats.topRowGuess.charAt(j)!;
+            }
+            for (let i = 0; i < this.wordLength; i++) {
+                const letter = this.rows[0].letters[i];
+                if (letter.text.localeCompare(this.targetWord[i]) === 0) {
+                    letter.state = LetterState.MATCH;
+                } else {
+                    letter.state = LetterState.PENDING;
+                    break;
+                }
+            }
+        }
+
+        if (gameStats.bottomRowGuess) {
+            for (let j = 0; j < this.wordLength; j++) {
+                this.rows[2].letters[j].text = gameStats.bottomRowGuess.charAt(j)!;
+            }
+            for (let i = 0; i < this.wordLength; i++) {
+                const letter = this.rows[2].letters[i];
+                if (letter.text.localeCompare(this.targetWord[i]) === 0) {
+                    letter.state = LetterState.MATCH;
+                } else {
+                    letter.state = LetterState.PENDING;
+                    break;
+                }
+            }
+        }
+
+        //set middle row
+        for (let j = 0; j < this.wordLength; j++) {
+            this.rows[this.middleIndex].letters[j].text = this.targetWord[j];
+            this.rows[this.middleIndex].letters[j].state = LetterState.MATCH;
+        }
+        this.win = true;
+        this.showShareButton = true;
+        await this.wait(500);
+        this.showStatsContainer = true;
+    }
+
     async determineOrder(attemptString: string) {
         // correct answer, make win
         if (attemptString.localeCompare(this.targetWord) === 0) {
@@ -159,7 +330,9 @@ export class MainComponent implements OnInit {
                 this.rows[this.middleIndex].letters[j].state = LetterState.MATCH;
             }
             //show win message and add animations
+            this.guesses++;
             this.showInfoMessage('You win!', 3000);
+            logEvent(this.analytics, 'win');
             this.win = true;
             this.showShareButton = true;
             await this.wait(450);
@@ -169,13 +342,18 @@ export class MainComponent implements OnInit {
             jsConfetti.addConfetti();
 
             await this.wait(1500);
+            this.setLocalStorage();
             //toggle stats container
             this.showStatsContainer = true;
             
             return;
+
         // check if in bookend bounds
         } else if (attemptString.localeCompare(this.bottomWord) === -1  && attemptString.localeCompare(this.topWord) === 1) {
-            if (true /** determine if valid word - TODO */) {
+            /** determine if valid word */
+            const firstLetter = attemptString[0] as keyof typeof wordsDict.dictionary;
+            const validWords = wordsDict.dictionary[firstLetter];
+            if (validWords.includes(attemptString)) {
                 // determine if new top or bottom bookend
                 if (attemptString.localeCompare(this.targetWord) === -1) {
                     this.setBookend(attemptString, 0);
@@ -184,6 +362,9 @@ export class MainComponent implements OnInit {
                     this.setBookend(attemptString, 2);
                     this.bottomWord = attemptString;
                 }
+            } else {
+                this.showInfoMessage('Not a valid word');
+                this.shake();
             }
         // make sure not equal to existing bookends    
         } else if (attemptString.localeCompare(this.bottomWord) === 0 || attemptString.localeCompare(this.topWord) === 0) {
@@ -202,6 +383,14 @@ export class MainComponent implements OnInit {
      */
     async setBookend(attemptString: string, index: number) {
 
+        if (index == 0) {
+            this.topRowGuess = attemptString;
+        } else {
+            this.bottomRowGuess = attemptString;
+        }
+
+        this.guesses++;
+
         // hacky mutex
         this.inputLock = true;
 
@@ -211,7 +400,7 @@ export class MainComponent implements OnInit {
         const bottomRowElement = this.bottomRow?.nativeElement as HTMLElement;
 
         //animate middle row to move towards top or bottom bookend
-        if (index == 0) {
+        if (index === 0) {
             middleRowElement.classList.add('move-up');
         } else {
             middleRowElement.classList.add('move-down');
@@ -258,19 +447,15 @@ export class MainComponent implements OnInit {
                 if(!skipBool) {
                     if (letter.text.localeCompare(this.targetWord[i]) === 0) {
                         letter.state = LetterState.MATCH;
-                        this.emojiString += '🟩';
                     } else {
                         letter.state = LetterState.PENDING;
-                        this.emojiString += '🟦';
                         skipBool = true;
                     }
                 } else {
                     letter.state = LetterState.PENDING;
-                    this.emojiString += '🟦';
                 }
             }
         }
-        this.emojiString += '\n';
         await this.wait(600);
         this.animationToggle = false;
 
@@ -294,19 +479,25 @@ export class MainComponent implements OnInit {
     }
 
     handleClickShare() {
-        // TO DO
         this.showStatsContainer = false;
 
-        this.clipboardString += 'INFO ABOUT DAYS GAME\n';
+        this.clipboardString += 'INTERWORD #' + this.days + '\n' + this.guesses + ' GUESS(ES)\n';
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < this.wordLength; j++) {
+                if (this.rows[i].letters[j].state === LetterState.MATCH) {
+                    this.clipboardString += '🟩';
+                } else {
+                    this.clipboardString += '⬛';
+                }
+            }
+            if (i !== 2) {
+                this.clipboardString += '\n. . .\n';
+            }
+        }
 
-        this.clipboardString += this.emojiString;
         navigator.clipboard.writeText(this.clipboardString);
-
         this.showInfoMessage('Results copied to clipboard');
-    }
-
-    giveUp() {
-        // TODO
+        logEvent(this.analytics, 'share');
     }
 
     initRows() {

@@ -235,6 +235,17 @@
                     &.last {
                         padding-bottom: 12px;
                     }
+                    
+                    &.sub-header {
+                        text-align: center;
+                        font-size: small;
+                        font-weight: bold;
+                        margin: 16px 16px 16px 16px;
+                    }
+
+                    span {
+                        font-weight: bold;
+                    }
                 }
 
                 .button {
@@ -286,7 +297,7 @@
 
                     .left {
                         background-color: var(--color-tone-darkerblue);
-                        width: 106%;
+                        width: 164%;
                         height: 100%;
                         display: flex;
                         justify-content: flex-end;
@@ -317,16 +328,14 @@
                         display: flex;
                         flex-direction: column;
                         font-weight: 700;
-                        padding: 0 12px 0 8px;
-                        margin-left: -8px;
     
                         .header {
-                            font-size: large;
+                            font-size: medium;
                             text-align: center;
                         }
     
                         .timer {
-                            font-size: xx-large;
+                            font-size: 28px;
                             text-align: center;
                         }
                     }
@@ -342,7 +351,7 @@
                         cursor: pointer;
                         display: flex;
                         align-items: center;
-                        margin-left: 12px;
+                        margin-left: 20px;
                         margin-bottom: 4px;
 
                         &.give-up {
@@ -463,7 +472,7 @@
     }
 
     @keyframes pop-in {
-        1% {
+        0% {
             transform: scale(0.1);
             opacity: 0;
         }

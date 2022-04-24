@@ -65,10 +65,12 @@ def set_target_words():
         bottom_word = random.choice(dictionary[bottom_letter])
         newWords.append([word, top_word, bottom_word])
     
+    random.shuffle(newWords)
+    
     newTargetWordJSON = json.dumps(newWords, indent = 4)
     with open('src/app/util/targetWordsClean2.json', 'w') as out:
         out.write(newTargetWordJSON)
 
-clean_files()
-set_target_words()
 
+#clean_files()
+#set_target_words()

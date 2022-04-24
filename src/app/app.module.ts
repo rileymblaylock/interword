@@ -8,7 +8,7 @@ import { environment } from '../environments/environment';
 import { provideAnalytics,getAnalytics,ScreenTrackingService,UserTrackingService } from '@angular/fire/analytics';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
-import { Auth, AuthModule, provideAuth } from '@angular/fire/auth';
+import { AuthModule, provideAuth } from '@angular/fire/auth';
 import { getAuth } from 'firebase/auth';
 
 @NgModule({

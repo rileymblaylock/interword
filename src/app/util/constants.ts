@@ -1,3 +1,6 @@
+import dictionary from 'src/app/util/dictionaryClean.json';
+import targetWords from 'src/app/util/targetWordsClean2.json';
+
 export const KeyboardRows = [
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
     ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ''],
@@ -31,3 +34,24 @@ export enum LetterState {
     MATCH
 };
 
+export const startDateConstant = new Date(Date.UTC(2022, 3, 24));
+
+export const wordsDict = {
+    dictionary: dictionary,
+    targetWords: targetWords
+};
+
+export interface gameStatsObject {
+    playedToday: boolean,
+    topRowGuess: string | undefined,
+    bottomRowGuess: string | undefined,
+    dayNumber: number,
+    prevPlayedDay: number | undefined;
+    guesses: number,
+    streak: number,
+    daysPlayed: number,
+    maxStreak: number,
+    minGuesses: number,
+    maxGuesses: number,
+    avgGuesses: number
+}
