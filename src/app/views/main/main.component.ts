@@ -494,7 +494,7 @@ export class MainComponent implements OnInit {
                 this.clipboardString += '\n. . .\n';
             }
         }
-
+        this.clipboardString += '\nhttps://interword-game.com/'
         navigator.clipboard.writeText(this.clipboardString);
         this.showInfoMessage('Results copied to clipboard');
         logEvent(this.analytics, 'share');
