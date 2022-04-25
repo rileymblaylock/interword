@@ -479,9 +479,10 @@ export class MainComponent implements OnInit {
     }
 
     handleClickShare() {
+        this.clipboardString = '';
         this.showStatsContainer = false;
 
-        this.clipboardString += 'INTERWORD #' + this.days + '\n' + this.guesses + ' GUESS(ES)\n';
+        this.clipboardString += 'INTERWORD #' + this.days + '\n' + this.guesses + ' guess(es)\n';
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < this.wordLength; j++) {
                 if (this.rows[i].letters[j].state === LetterState.MATCH) {
@@ -553,6 +554,9 @@ export class MainComponent implements OnInit {
 
     toggleHeart() {
         this.showHeartContainer = !this.showHeartContainer;
+        if(this.showHeartContainer) {
+            logEvent(this.analytics, 'heart_button');
+        }
     }
 
     toggleStats() {
