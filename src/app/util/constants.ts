@@ -34,7 +34,7 @@ export enum LetterState {
     MATCH
 };
 
-export const startDateConstant = new Date(Date.UTC(2022, 3, 24));
+export const startDateConstant = new Date(Date.UTC(2022, 3, 25));
 
 export const wordsDict = {
     dictionary: dictionary,
