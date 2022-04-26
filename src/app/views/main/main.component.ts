@@ -94,7 +94,10 @@ export class MainComponent implements OnInit {
         // current date in UTC
         let currentDateUTC = new Date(dateUTC);
         // get predetermined start date in UTC
-        let startDate = startDateConstant;
+        //let startDate = startDateConstant;
+        let startDateUTC = Date.UTC(startDateConstant.getUTCFullYear(), startDateConstant.getUTCMonth(), startDateConstant.getUTCDate(),
+            startDateConstant.getUTCHours() + 6, startDateConstant.getUTCMinutes(), startDateConstant.getUTCSeconds());
+        let startDate = new Date(startDateUTC);
         this.days = currentDateUTC.getTime() - startDate.getTime();
         this.days = Math.floor(this.days / (1000 * 3600 * 24));
         //set todays words
@@ -222,7 +225,7 @@ export class MainComponent implements OnInit {
         setInterval(function(){ 
             var date = new Date(); 
             var now_utc =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-                date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+                date.getUTCHours() - 6, date.getUTCMinutes(), date.getUTCSeconds());
             var todayDate = new Date(now_utc);
             var tomorrow = new Date(now_utc);
             tomorrow.setUTCHours(24,0,0,0);
@@ -482,7 +485,12 @@ export class MainComponent implements OnInit {
         this.clipboardString = '';
         this.showStatsContainer = false;
 
-        this.clipboardString += 'INTERWORD #' + this.days + '\n' + this.guesses + ' guess(es)\n';
+        if (this.guesses > 1) {
+            this.clipboardString += 'INTERWORD #' + this.days + '\n' + this.guesses + ' guess(es)\n';
+        } else {
+            this.clipboardString += 'INTERWORD #' + this.days + '\n' + this.guesses + ' guess\n';
+        }
+
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < this.wordLength; j++) {
                 if (this.rows[i].letters[j].state === LetterState.MATCH) {
