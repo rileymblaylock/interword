@@ -486,7 +486,7 @@ export class MainComponent implements OnInit {
         this.showStatsContainer = false;
 
         if (this.guesses > 1) {
-            this.clipboardString += 'INTERWORD #' + this.days + '\n' + this.guesses + ' guess(es)\n';
+            this.clipboardString += 'INTERWORD #' + this.days + '\n' + this.guesses + ' guesses\n';
         } else {
             this.clipboardString += 'INTERWORD #' + this.days + '\n' + this.guesses + ' guess\n';
         }
