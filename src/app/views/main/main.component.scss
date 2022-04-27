@@ -222,8 +222,16 @@
                 }
 
                 &.help {
-                    width: 350px;
+                    width: 360px;
                     height: auto;
+                    font-size: 16px;
+
+                    .sub-header {
+                        h2 {
+                            margin-top: 4px;
+                            margin-bottom: 8px;
+                        }
+                    }
                 }
 
                 .heart-message {
@@ -232,17 +240,35 @@
 
                     &.last {
                         padding-bottom: 12px;
-                    }
-                    
-                    &.sub-header {
-                        text-align: center;
-                        font-size: small;
-                        font-weight: bold;
-                        margin: 16px 16px 16px 16px;
+                        border-bottom: 1px solid var(--color-tone-darkgray);
                     }
 
                     span {
                         font-weight: bold;
+                    }
+                }
+
+                .example-container {
+                    display: flex;
+                    flex-direction: row;
+                    border-bottom: 1px solid var(--color-tone-darkergray-2);
+                    padding-bottom: 12px;
+                    margin: 6px 16px 12px 16px;
+
+                    &.last {
+                        border-bottom: none;
+                        margin-bottom: 0;
+                    }
+
+                    .image-container {
+                        img {
+                            width: 140px;
+                            height: auto;
+                        }
+                    }
+
+                    .text-container {
+                        padding-left: 20px;
                     }
                 }
 

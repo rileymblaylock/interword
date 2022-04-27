@@ -366,7 +366,7 @@ export class MainComponent implements OnInit {
                     this.bottomWord = attemptString;
                 }
             } else {
-                this.showInfoMessage('Not a valid word');
+                this.showInfoMessage('Not a word');
                 this.shake();
             }
         // make sure not equal to existing bookends    

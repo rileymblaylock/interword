@@ -96,11 +96,27 @@
         <div class="pop-up-container" [class.show]="showHelpContainer" (click)="toggleHelp()">
             <div class="content help" [class.show]="showHelpContainer">
                 <div class="header"><h2>HOW TO PLAY</h2></div>
-                <div class="heart-message sub-header">INTERWORD - an alphabetical word guessing game</div>
                 <div class="heart-message">Guess a word that falls <span>alphabetically</span> between the top and bottom words.</div>
-                <div class="heart-message">Keep guessing to narrow your search.</div>
+                <div class="heart-message">Keep guessing to narrow your search, with each subsequent guess setting a new upper or lower bound <span>alphabetically</span>.</div>
                 <div class="heart-message">Letters will turn green when you guess them in the correct order.</div>
                 <div class="heart-message last">Guess the correct word to win. Good luck!</div>
+                <div class="header sub-header"><h2>EXAMPLES</h2></div>
+                <div class="example-container">
+                    <div class="image-container">
+                        <img src="https://raw.githubusercontent.com/rileymblaylock/interword-images/main/Screen%20Shot%202022-04-26%20at%2021.57.50.png">
+                    </div>
+                    <div class="text-container">
+                        Here, BREAD is a valid guess, as BREAD starts with B and comes after BLEND alphabetically.
+                    </div>
+                </div>
+                <div class="example-container last">
+                    <div class="image-container">
+                        <img src="https://raw.githubusercontent.com/rileymblaylock/interword-images/main/Screen%20Shot%202022-04-26%20at%2021.58.10.png">
+                    </div>
+                    <div class="text-container">
+                        Here, BRAKE is a valid guess, as BRAKE starts with BA and comes before BREAD alphabetically.
+                    </div>
+                </div>
             </div>
         </div>
         <!-- STATS POPUP -->
