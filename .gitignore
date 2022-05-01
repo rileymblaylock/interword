@@ -48,3 +48,7 @@ Thumbs.db
 /.firebase
 *-debug.log
 .runtimeconfig.json
+
+#dictionary
+/src/app/util/words
+/python/words

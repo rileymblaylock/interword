@@ -1,5 +1,5 @@
-import dictionary from 'src/app/util/dictionaryClean.json';
-import targetWords from 'src/app/util/targetWordsClean2.json';
+import dictionary from 'src/app/util/words/dictionaryClean.json';
+import targetWords from 'src/app/util/words/targetWordsClean2.json';
 
 export const KeyboardRows = [
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],

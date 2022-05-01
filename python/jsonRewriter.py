@@ -2,8 +2,8 @@ import json
 import random
 
 def clean_files():
-    targetWords = open('src/app/util/targetWords.json')
-    dictionary = open('src/app/util/dictionary.json')
+    targetWords = open('src/app/util/words/targetWords.json')
+    dictionary = open('src/app/util/words/dictionary.json')
 
     data = json.load(targetWords)
 
