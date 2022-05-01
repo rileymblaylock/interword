@@ -1,3 +1,6 @@
+# These functions generate a clean and random list of about 1000 daily words from the given files, with their
+# corresponding alpbabetically constrained top and bottom bookend words
+
 import json
 import random
 
