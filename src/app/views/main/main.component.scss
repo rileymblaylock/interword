@@ -288,17 +288,11 @@
                 .game-title {
                     font-size: 12px;
                     color: var(--color-tone-white);
-                    margin: 12px 16px 6px 16px;
+                    margin: 12px 16px 20px 16px;
 
                     a {
                         color: var(--color-tone-white);
                     }
-                }
-
-                .twitter {
-                    display: flex;
-                    margin: 8px 20px 12px 20px;
-                    justify-content: flex-end;
                 }
 
                 .stats-sub-header {
@@ -377,15 +371,21 @@
                         align-items: center;
                         margin-left: 20px;
                         margin-bottom: 4px;
-
-                        &.give-up {
-                            background-color: var(--color-tone-red);
-                            padding: 16px 18px;
-                        }
                         
                         svg {
                             padding-left: 8px;
                         }
+                    }
+                }
+
+                .linked-and-github {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+
+                    .social-img {
+                        margin: 0 16px 24px 16px;
                     }
                 }
             }
