@@ -339,8 +339,8 @@
                     flex-direction: row;
                     justify-content: center;
                     align-items: center;
-                    margin-bottom: 32px;
-                    margin-top: 38px;
+                    margin-bottom: 26px;
+                    margin-top: 30px;
 
                     .timer-container {
                         display: flex;
@@ -370,7 +370,7 @@
                         display: flex;
                         align-items: center;
                         margin-left: 20px;
-                        margin-bottom: 4px;
+                        margin-bottom: 2px;
                         
                         svg {
                             padding-left: 8px;
@@ -380,12 +380,39 @@
 
                 .linked-and-github {
                     display: flex;
-                    flex-direction: row;
+                    flex-direction: column;
                     justify-content: center;
                     align-items: center;
+                    margin-top: 2px;
+                    margin-bottom: 6px;
+
+                    a {
+                        color: var(--color-tone-white);
+                        text-decoration: none;
+                    }
 
                     .social-img {
-                        margin: 0 16px 24px 16px;
+                        margin: 0 0 16px 0;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+
+                        .social-text {
+                            font-weight: 700;
+                            font-size: medium;
+                            text-align: center;
+                            justify-content: center;
+
+                            &.top {
+                                padding: 0 0 0 12px;
+                            }
+
+                            &.bottom {
+                                padding: 0 14px 0 0;
+                            }
+                        }
                     }
                 }
             }
