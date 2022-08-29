@@ -500,10 +500,9 @@ export class MainComponent implements OnInit {
                 }
             }
             if (i !== 2) {
-                this.clipboardString += '\n. . .\n';
+                this.clipboardString += '\n' + '   ' + '...\n';
             }
         }
-        this.clipboardString += '\n\nhttps://interword-game.com'
         navigator.clipboard.writeText(this.clipboardString);
         this.showInfoMessage('Results copied to clipboard');
         logEvent(this.analytics, 'share');
