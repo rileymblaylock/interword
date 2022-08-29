@@ -500,7 +500,7 @@ export class MainComponent implements OnInit {
                 }
             }
             if (i !== 2) {
-                this.clipboardString += '\n' + '   ' + '...\n';
+                this.clipboardString += '\n . . .\n';
             }
         }
         navigator.clipboard.writeText(this.clipboardString);
